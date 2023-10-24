@@ -8,6 +8,14 @@ public class WordFrequency{
     private final String word;
     private Integer frequency;
 
+    public String getWord() {
+        return word;
+    }
+
+    public Integer getFrequency() {
+        return frequency;
+    }
+
     public WordFrequency(String wordString, Integer frequency) {
         this.word = wordString;
         this.frequency = frequency;
