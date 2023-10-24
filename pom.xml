@@ -15,7 +15,7 @@
     <description>auto-suggest-pro</description>
     <modules>
         <module>aggregator</module>
-        <module>suggester</module>
+<!--        <module>suggester</module>-->
     </modules>
 
 
