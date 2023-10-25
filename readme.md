@@ -3,7 +3,7 @@
 
 # Auto Suggest Pro
 
-Auto Suggest Pro is a Java project that provides a type-ahead suggestion feature backed by a Trie data structure and Redis. The project is divided into two modules: Aggregator and Suggestor.
+Auto Suggest Pro is a Java project that provides a type-ahead suggestion feature backed by a Trie data structure and Redis. The project is divided into two modules: Aggregator and Suggester.
 
 
 ### Aggregator Module
@@ -21,7 +21,7 @@ Auto Suggest Pro is a Java project that provides a type-ahead suggestion feature
 The project follows a Maven project structure and is divided into two modules:
 
 - `aggregator`: The Aggregator module.
-- `suggestor`: The Suggestor module.
+- `Suggester`: The Suggester module.
 
 Each module has its own `pom.xml` for dependency management.
 
@@ -39,7 +39,7 @@ The project uses the following dependencies:
 You can configure the interval for transferring data to Redis by setting the `redis.transfer.interval` property in the `application.properties` or `application.yml` file. The interval is specified in seconds.
 
 ```properties
-redis.transfer.interval=300 # Set the transfer interval to 300 seconds (5 minutes)
+redis.transfer.interval=300000 # Set the transfer interval to 300000 milliseconds (5 minutes)
 ```
 
 ## Usage
@@ -56,24 +56,18 @@ redis.transfer.interval=300 # Set the transfer interval to 300 seconds (5 minute
    java -jar aggregator/target/aggregator.jar
    ```
 
-   Start the Suggestor module in a similar way.
+   Start the Suggester module in a similar way.
 
-3. Use the API provided by the Suggestor to retrieve suggestions.
+3. Use the API provided by the Suggester to retrieve suggestions.
 
 ## API Endpoints
+- aggregator module API:
 
-The Suggestor module provides the following API endpoints:
+   `POST http://localhost:8081/terms/collect?term=scatter`
 
-- `/suggestions`: Get suggestions for a given prefix.
+- suggester module API:
+   `GET http://localhost:8080/suggester/suggestWords?userInput=sc`
 
-## Contributing
 
-We welcome contributions to this project. If you have ideas for improvements or new features, feel free to open an issue or create a pull request.
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
-
----
-
-Feel free to customize this README to provide more specific details about your project and its usage. Make sure to include any additional installation or setup instructions, deployment details, and any other relevant information for your users.
+## Demo
+![Screen Recording 2023-10-25 at 9.28.42 AM copy.gif](suggester%2Fsrc%2Fmain%2Fresources%2FScreen%20Recording%202023-10-25%20at%209.28.42%20AM%20copy.gif)
