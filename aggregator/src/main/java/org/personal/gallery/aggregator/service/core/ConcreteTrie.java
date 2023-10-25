@@ -5,28 +5,29 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.personal.gallery.aggregator.service.core.models.TrieNode;
 import org.personal.gallery.aggregator.service.core.models.WordFrequency;
+import org.personal.gallery.aggregator.service.ports.Redis;
 import org.personal.gallery.aggregator.service.ports.Trie;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.Pipeline;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class ConcreteTrie implements Trie {
-    private static final String PREFIX_INFO = "prefix_info";
     private final TrieNode root;
-    private final Jedis jedis;
     private final Gson gson;
 
-    public ConcreteTrie() {
+    private final Redis redisClient;
+
+    @Autowired
+    public ConcreteTrie(Redis redisClient) {
         root = TrieNode.getNewTrieNode();
         gson = new Gson();
-        jedis = new Jedis("localhost", 6379);
+        this.redisClient = redisClient;
     }
-
 
 
     public void insertWord(String word, int frequency) {
@@ -39,7 +40,7 @@ public class ConcreteTrie implements Trie {
 
             node.getWordList()
                     .getOrDefault(runningPrefix.toString(), WordFrequency.from(runningPrefix,
-                    0)).addFrequency(frequency);
+                            0)).addFrequency(frequency);
 
         }
         node.getWordList()
@@ -49,8 +50,11 @@ public class ConcreteTrie implements Trie {
 
     @Override
     public List<WordFrequency> retrievePrefixInfoFromRedis(String prefix) {
-        String jsonString = jedis.hget(PREFIX_INFO, prefix);
+        String jsonString = redisClient.retrieve(prefix);
+        return getFromJson(jsonString);
+    }
 
+    private List<WordFrequency> getFromJson(String jsonString) {
         return gson.fromJson(jsonString, new TypeToken<List<WordFrequency>>() {
         }.getType());
     }
@@ -60,13 +64,18 @@ public class ConcreteTrie implements Trie {
         Map<String, List<WordFrequency>> prefixInfo = new HashMap<>();
         precomputePrefixes(root, "", prefixInfo);
 
-        Pipeline pipeline = jedis.pipelined();
-        for (Map.Entry<String, List<WordFrequency>> entry : prefixInfo.entrySet()) {
-            String prefix = entry.getKey();
-            List<WordFrequency> words = entry.getValue();
-            pipeline.hset(PREFIX_INFO, prefix, toJson(words));
-        }
-        pipeline.sync();
+
+        Map<String, String> transformedMap = prefixInfo.entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> toJson(entry.getValue())
+                ));
+
+
+        redisClient.store(transformedMap);
+
+
     }
 
     private void precomputePrefixes(TrieNode node, String prefix, Map<String, List<WordFrequency>> prefixInfo) {

@@ -22,6 +22,6 @@ public class AggregatorApplication {
 /***
  *
  *     1.read content from file -> apply map-reduce job to create map -> create a prefixmap <prefix, list<word with freq>> -> store in redis
- *     user need suggestion -> read from redis and return
+ *     2. user need suggestion -> read from redis and return
  *
  */
