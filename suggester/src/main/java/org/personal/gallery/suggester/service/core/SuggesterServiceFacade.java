@@ -8,8 +8,9 @@ import org.personal.gallery.suggester.service.ports.SuggesterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 @Service
 public class SuggesterServiceFacade implements SuggesterService {
@@ -34,7 +35,13 @@ public class SuggesterServiceFacade implements SuggesterService {
         List<WordFrequency> wordFrequencyList = gson.fromJson(jsonString, new TypeToken<List<WordFrequency>>() {
         }.getType());
 
-        return wordFrequencyList.stream().map(WordFrequency::getWord).collect(Collectors.toList());
+        if (wordFrequencyList.isEmpty())
+            return Collections.emptyList();
+
+        return wordFrequencyList.stream()
+                .map(WordFrequency::getWord)
+                .filter(Objects::nonNull)
+                .toList();
 
     }
 }

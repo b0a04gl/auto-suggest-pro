@@ -92,17 +92,6 @@ public class ConcreteTrie implements Trie {
     }
 
     private String toJson(List<WordFrequency> wordList) {
-
         return gson.toJson(wordList);
-
-//        StringBuilder json = new StringBuilder("[");
-//        for (WordFrequency wf : wordList) {
-//            json.append("{\"word\":\"").append(wf.word).append("\",\"frequency\":").append(wf.frequency).append("},");
-//        }
-//        if (json.charAt(json.length() - 1) == ',') {
-//            json.setLength(json.length() - 1); // Remove the trailing comma
-//        }
-//        json.append("]");
-//        return json.toString();
     }
 }
